@@ -3,10 +3,11 @@ PROGRAM EDP
     USE VYM_IO
     USE VYM_CALCULOS
     USE EDP_SETUP
+    USE EDP_TABLA
     
     IMPLICIT NONE
     REAL(8), DIMENSION(:), ALLOCATABLE :: UINI, UFIN
-    REAL(8) :: DX, DT, R
+    REAL(8) :: DX, DT, R, TOL
     REAL(8) :: XFINAL, TFINAL
     !
     PRINT *, 'Calculando los valores de DX, DT y R.'
@@ -23,10 +24,15 @@ PROGRAM EDP
     PRINT *, 'XFINAL = ', XFINAL, 'TFINAL = ', TFINAL
     
     PRINT *, 'Empezando método explícito.'
-    CALL MET_EXPLICITO(UINI, UFIN, DX, DT, TFINAL)
+    CALL MET_EXPLICITO(UINI, UFIN, DX, DT, TFINAL, R)
     PRINT *, 'Fin método explícito.'
     GOTO 10
- 20 PRINT *, 'R inestable, volver a intentar.'
+ 20 PRINT *, 'R mayor a 0.5, se intenta con método implícito.'
+    TOL = 0.00001
+    PRINT *, 'Se establece una tolerancia TOL = ', TOL
+    PRINT *, 'Empezando método implícito.'
+    CALL MET_IMPLICITO(UINI, UFIN, DX, DT, TFINAL, R, TOL)
+    PRINT *, 'Fin método implícito.'
  10 PRINT *, 'Fin.'
 CONTAINS
     SUBROUTINE CALCULOS_DE_R(DX, DT, R)
@@ -48,59 +54,43 @@ CONTAINS
         WRITE(*,'(3(A, F15.10, /))') 'DX = ', DX, 'DT = ', DT, 'R  = ', R
     END SUBROUTINE
     !---Método Explícito---!
-    SUBROUTINE MET_EXPLICITO(UINI, U, DX, DT, TFINAL)
+    SUBROUTINE MET_EXPLICITO(UINI, U, DX, DT, TFINAL, R)
         REAL(8), DIMENSION(:), INTENT(IN) :: UINI
         REAL(8), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: U
-        REAL(8), INTENT(IN) :: DX, DT, TFINAL
+        REAL(8), INTENT(IN) :: DX, DT, TFINAL, R
         !
         REAL(8), DIMENSION(:), ALLOCATABLE :: UANT
-        REAL(8) :: T, XAUX
+        REAL(8) :: T
         INTEGER :: I, N
         CHARACTER(*), PARAMETER :: ARCHIVO = 'EDP Explicito.txt'
         
         OPEN(1, FILE = ARCHIVO, ACTION = 'WRITE')
-
+        
         N = SIZE(UINI)
         ALLOCATE(UANT(N), U(N))
         U = UINI
         
-        !Escribo en el primer renglon las referencias de la tabla
-        WRITE(1, '(A1)', ADVANCE = 'NO') '%'
-        WRITE(1, '(A14)', ADVANCE = 'NO') 't\x'
-        XAUX = 0.
-        DO I = 1, N
-            WRITE(1, '(F25.15, A)', ADVANCE = 'NO') XAUX, ' '
-            XAUX = XAUX + DX
-        END DO
-        WRITE(1,'()')
-        !
-        
-        !Escribo el paso inicial
         T = 0.
-        WRITE(1,'(F15.10)', ADVANCE = 'NO') T
-        DO I = 1, N
-                WRITE(1, '(F25.15, A)', ADVANCE = 'NO') U(I), ' '
-        END DO
-        WRITE(1,'()')
+        !Escribo en el primer renglón las referencias de la tabla
+        CALL T_CABECERA(DX, N)        
+        !Escribo el paso inicial
+        CALL T_PASOINICIAL(U, T)
         
+        !Para ver si se está yendo al correcto:
+        PRINT *, 'R = ', R
+        PRINT *, '¿R == 0.5?', R == 0.5
         !El ciclo en sí.
         DO WHILE(T <= TFINAL)
             T = T + DT
             UANT = U
-            WRITE(1,'(F15.10)', ADVANCE = 'NO') T
             DO I = 2, N-1
                 IF (R == 0.5) THEN !Sé que estoy haciendo un if en cada iteración y no me importa.
                     U(I) = (UANT(I+1) + UANT(I-1)) / 2.
-                    PRINT *, 'R == 0.5'
                 ELSE
                     U(I) = R*(UANT(I+1) + UANT(I-1)) + (1. - 2.*R) * UANT(I)
-                    PRINT *, 'R /= 0.5'
                 END IF
             END DO
-            DO I = 1, N
-                WRITE(1, '(F25.15, A)', ADVANCE = 'NO') U(I), ' '
-            END DO
-            WRITE(1,'()')
+            CALL T_PASO(U, T)
         END DO
         
         CLOSE(1)
@@ -108,21 +98,34 @@ CONTAINS
     END SUBROUTINE
     
     !---Método Implícito---!
-    SUBROUTINE MET_IMPLICITO(UINI, U, DX, DT, TFINAL, TOL)
+    SUBROUTINE MET_IMPLICITO(UINI, U, DX, DT, TFINAL, R, TOL)
         REAL(8), DIMENSION(:), INTENT(IN) :: UINI
         REAL(8), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: U
-        REAL(8), INTENT(IN) :: DX, DT, TFINAL, TOL
+        REAL(8), INTENT(IN) :: DX, DT, TFINAL, R, TOL
         !
         REAL(8), DIMENSION(:), ALLOCATABLE :: UANT, UERROR
-        REAL(8) :: ERROR, X, T
+        REAL(8) :: ERROR, T
         INTEGER :: N, ITER
         INTEGER, PARAMETER :: MAXITER = 1000
+        CHARACTER(*), PARAMETER :: ARCHIVO = 'EDP Explicito.txt'
         
+        OPEN(1, FILE = ARCHIVO, ACTION = 'WRITE')
         N = SIZE(UINI)
         ALLOCATE(U(N), UANT(N), UERROR(N))
         U = UINI
         
+        T = 0.
+        !Escribo en el primer renglón las referencias de la tabla
+        CALL T_CABECERA(DX, N)        
+        !Escribo el paso inicial
+        CALL T_PASOINICIAL(U, T)
+        
+        !Para ver si se está yendo al correcto:
+        PRINT *, 'R = ', R
+        PRINT *, '¿R == 1?', R == 1.
+        !
         DO WHILE(T <= TFINAL)
+            T = T + DT
             UANT = U
             ERROR = 2*TOL 
             ITER = 0; ERROR = 2.*TOL !Valor imposible
@@ -132,10 +135,12 @@ CONTAINS
                 ERROR = VEC_NORMAM(U-UERROR) !porque UANT es el del paso de tiempo anterior
                 ITER = ITER + 1
             END DO
-            
+            CALL T_PASO(U, T)
         END DO
+        CLOSE(1)
     END SUBROUTINE
     
+    !Paso del método indirecto.
     SUBROUTINE PASONORMAL(U, UANT, R)
         REAL(8), INTENT(IN) :: UANT(:), R
         REAL(8), INTENT(INOUT) :: U(:)

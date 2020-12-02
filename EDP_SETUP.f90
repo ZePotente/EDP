@@ -45,7 +45,7 @@ CONTAINS
         !
         DX = 0.1
         DT = 0.
-        R = 0.5
+        R = 1.0
 !        R = 1./6.
     END SUBROUTINE
     
