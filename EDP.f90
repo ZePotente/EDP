@@ -14,7 +14,6 @@ PROGRAM EDP
     CALL CALCULOS_DE_R(DX, DT, R)
     CALL MOSTRAR_CALC_R(DX, DT, R)
     
-    IF (R > 0.5) GOTO 20
     PRINT *, 'Creando vector inicial U'
     CALL INICIALIZAR_EDP(UINI, DX, XFINAL, TFINAL)
     PRINT *, 'Vector creado'
@@ -23,6 +22,8 @@ PROGRAM EDP
     CALL VEC_MOSTRAR(UINI)
     PRINT *, 'XFINAL = ', XFINAL, 'TFINAL = ', TFINAL
     
+    GOTO 20
+    IF (R > 0.5) GOTO 20
     PRINT *, 'Empezando método explícito.'
     CALL MET_EXPLICITO(UINI, UFIN, DX, DT, TFINAL, R)
     PRINT *, 'Fin método explícito.'
@@ -107,7 +108,7 @@ CONTAINS
         REAL(8) :: ERROR, T
         INTEGER :: N, ITER
         INTEGER, PARAMETER :: MAXITER = 1000
-        CHARACTER(*), PARAMETER :: ARCHIVO = 'EDP Explicito.txt'
+        CHARACTER(*), PARAMETER :: ARCHIVO = 'EDP Implicito.txt'
         
         OPEN(1, FILE = ARCHIVO, ACTION = 'WRITE')
         N = SIZE(UINI)
@@ -150,9 +151,9 @@ CONTAINS
         
         N = SIZE(U)
         DO I = 2, N-1
-            IF (R == 1.) THEN !Sé que estoy haciendo un if en cada iteración y no me importa.
-                C = R*UANT(I-1) + (2.*(-2.)*R)*UANT(I) + R*UANT(I+1)
-                U(I) = (C + R*(U(I-1) + U(I+1))) / (2.+2.*R)
+            IF (R /= 1.) THEN !Sé que estoy haciendo un if en cada iteración y no me importa.
+                C = R*UANT(I-1) + (2. - 2.*R)*UANT(I) + R*UANT(I+1)
+                U(I) = (C + R*(U(I-1) + U(I+1))) / (2. + 2.*R)
             ELSE
                 U(I) = (U(I-1) + U(I+1) + UANT(I-1) + UANT(I+1)) / 4.
             END IF

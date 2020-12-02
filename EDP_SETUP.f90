@@ -45,8 +45,8 @@ CONTAINS
         !
         DX = 0.1
         DT = 0.
-        R = 1.0
-!        R = 1./6.
+        R =  1.
+!        R =  1./6.
     END SUBROUTINE
     
     !---Cálculos relacionados a R---!
