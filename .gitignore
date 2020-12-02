@@ -2,3 +2,4 @@ EDP
 EDP_SETUP
 *.o
 *.mod
+*.txt
