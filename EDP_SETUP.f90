@@ -48,6 +48,7 @@ CONTAINS
         R = 0.5
 !        R = 1./6.
     END SUBROUTINE
+    
     !---Cálculos relacionados a R---!
     !Usan C, K y RHO del módulo.
     

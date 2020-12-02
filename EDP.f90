@@ -1,6 +1,7 @@
 PROGRAM EDP
     !Modulo
     USE VYM_IO
+    USE VYM_CALCULOS
     USE EDP_SETUP
     
     IMPLICIT NONE
@@ -107,14 +108,49 @@ CONTAINS
     END SUBROUTINE
     
     !---Método Implícito---!
-!    SUBROUTINE MET_IMPLICITO()
-!        DO WHILE(ERRROR < TOL)
-!            DO I = 2, N-1
-!                C = R*UANT(I-1) + (2.*-2.*R)*UANT(I) + R*UANT(I+1)
-!                U(I) = (C + R*(U(I-1) + U(I+1))) / (2.+2,*R)
-!            END DO
-!            ERROR = VEC_NORMAM(U-UERROR) !porque UANT es el del paso de tiempo anterior
-!        END DO
-!    END SUBROUTINE
-
+    SUBROUTINE MET_IMPLICITO(UINI, U, DX, DT, TFINAL, TOL)
+        REAL(8), DIMENSION(:), INTENT(IN) :: UINI
+        REAL(8), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: U
+        REAL(8), INTENT(IN) :: DX, DT, TFINAL, TOL
+        !
+        REAL(8), DIMENSION(:), ALLOCATABLE :: UANT, UERROR
+        REAL(8) :: ERROR, X, T
+        INTEGER :: N, ITER
+        INTEGER, PARAMETER :: MAXITER = 1000
+        
+        N = SIZE(UINI)
+        ALLOCATE(U(N), UANT(N), UERROR(N))
+        U = UINI
+        
+        DO WHILE(T <= TFINAL)
+            UANT = U
+            ERROR = 2*TOL 
+            ITER = 0; ERROR = 2.*TOL !Valor imposible
+            DO WHILE(ITER < MAXITER .AND. ERROR >= TOL)
+                UERROR = U
+                CALL PASONORMAL(U, UANT, R)
+                ERROR = VEC_NORMAM(U-UERROR) !porque UANT es el del paso de tiempo anterior
+                ITER = ITER + 1
+            END DO
+            
+        END DO
+    END SUBROUTINE
+    
+    SUBROUTINE PASONORMAL(U, UANT, R)
+        REAL(8), INTENT(IN) :: UANT(:), R
+        REAL(8), INTENT(INOUT) :: U(:)
+        !
+        REAL(8) :: C
+        INTEGER :: I, N
+        
+        N = SIZE(U)
+        DO I = 2, N-1
+            IF (R == 1.) THEN !Sé que estoy haciendo un if en cada iteración y no me importa.
+                C = R*UANT(I-1) + (2.*(-2.)*R)*UANT(I) + R*UANT(I+1)
+                U(I) = (C + R*(U(I-1) + U(I+1))) / (2.+2.*R)
+            ELSE
+                U(I) = (U(I-1) + U(I+1) + UANT(I-1) + UANT(I+1)) / 4.
+            END IF
+        END DO
+    END SUBROUTINE
 END PROGRAM
