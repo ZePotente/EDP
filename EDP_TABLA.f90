@@ -1,5 +1,6 @@
 MODULE EDP_TABLA
     IMPLICIT NONE
+    CHARACTER(*), PARAMETER :: F_VAL = '(F15.7, A)', F_CUADRO = '(F15.7)'
 CONTAINS
 !---Subrutinas para escribir el archivo---!
     !Para no complicarme supongo que la unidad ya fue abierta y es la 1.
@@ -14,7 +15,7 @@ CONTAINS
         WRITE(1, '(A14)', ADVANCE = 'NO') 't\x'
         XAUX = 0.
         DO I = 1, N
-            WRITE(1, '(F25.15, A)', ADVANCE = 'NO') XAUX, ' '
+            WRITE(1, F_VAL, ADVANCE = 'NO') XAUX, ' '
             XAUX = XAUX + DX
         END DO
         WRITE(1,'()')
@@ -27,9 +28,9 @@ CONTAINS
         INTEGER :: I, N
         N = SIZE(U)
         
-        WRITE(1,'(F15.10)', ADVANCE = 'NO') T
+        WRITE(1,F_CUADRO, ADVANCE = 'NO') T
         DO I = 1, N
-                WRITE(1, '(F25.15, A)', ADVANCE = 'NO') U(I), ' '
+                WRITE(1, F_VAL, ADVANCE = 'NO') U(I), ' '
         END DO
         WRITE(1,'()')
     END SUBROUTINE
@@ -41,9 +42,9 @@ CONTAINS
         INTEGER :: I, N
         N = SIZE(U)
         
-        WRITE(1,'(F15.10)', ADVANCE = 'NO') T
+        WRITE(1,F_CUADRO, ADVANCE = 'NO') T
         DO I = 1, N
-            WRITE(1, '(F25.15, A)', ADVANCE = 'NO') U(I), ' '
+            WRITE(1, F_VAL, ADVANCE = 'NO') U(I), ' '
         END DO
         WRITE(1,'()')
     END SUBROUTINE
