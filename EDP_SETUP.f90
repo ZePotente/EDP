@@ -39,13 +39,17 @@ CONTAINS
     
     !Se les da valores a dos de las tres variables, la otra queda en 0.
     !Como no tiene sentido que alguna sea 0, esa va a ser la que hay que calcular
-    !Basándose en las otras dos.
+    !Basándose en las otras dos. 
+    !Esto en vez de armar un menú porque pensé que iba a ser más rápido de implementar.
     SUBROUTINE INICIALIZAR_VALORES_R(DX, DT, R)
         REAL(8), INTENT(OUT) :: DX, DT, R
         !
-        DX = 0.1
-        DT = 0.
-        R =  1.
+        DX = 0D0
+!        DX = 0.1
+!        DT = 0D0
+        DT = 0.02
+!        R =  1.
+        R = 1.
 !        R =  1./6.
     END SUBROUTINE
     
@@ -79,7 +83,7 @@ CONTAINS
     !du/dt = alfa. (d²u/dx²)
     FUNCTION CALC_ALFA()
         REAL(8) :: CALC_ALFA
-            
-        CALC_ALFA = K/(C*RHO)
+         CALC_ALFA = 1D0   
+        !CALC_ALFA = K/(C*RHO)
     END FUNCTION
 END MODULE

@@ -18,7 +18,7 @@ PROGRAM EDP
     CALL INICIALIZAR_EDP(UINI, DX, XFINAL, TFINAL)
     PRINT *, 'Vector creado'
     
-    PRINT *, 'Vector:'
+    PRINT *, 'Vector inicial:'
     CALL VEC_MOSTRAR(UINI)
     PRINT *, 'XFINAL = ', XFINAL, 'TFINAL = ', TFINAL
     
