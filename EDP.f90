@@ -23,7 +23,7 @@ PROGRAM EDP
     PRINT *, 'XFINAL = ', XFINAL, 'TFINAL = ', TFINAL
     
     !Por defecto, si R > 0.5 va al implícito. Descomentar la linea de abajo para ir al implícito directamente.
-!    GOTO 20
+    GOTO 20
     IF (R > 0.5) GOTO 20
     PRINT *, 'Empezando método explícito.'
     CALL MET_EXPLICITO(UINI, UFIN, DX, DT, TFINAL, R)

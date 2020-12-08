@@ -22,7 +22,7 @@ CONTAINS
         INTEGER :: I, N
         
         XFINAL = 1.
-        TFINAL = 4.
+        TFINAL = 0.2
         
         N = NINT(XFINAL/DX) + 1 !Redondeo a int y sumo 1.
         ALLOCATE(UINI(N))
@@ -44,12 +44,12 @@ CONTAINS
     SUBROUTINE INICIALIZAR_VALORES_R(DX, DT, R)
         REAL(8), INTENT(OUT) :: DX, DT, R
         !
-        DX = 0D0
-!        DX = 0.1
-!        DT = 0D0
-        DT = 0.02
+!        DX = 0D0
+        DX = 0.1
+        DT = 0D0
+!        DT = 0.02
 !        R =  1.
-        R = 1.
+        R = 0.5
 !        R =  1./6.
     END SUBROUTINE
     
