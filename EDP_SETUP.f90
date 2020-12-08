@@ -8,7 +8,7 @@ MODULE EDP_SETUP
     !C: Calor específico [J/kg.K]           puede ser tambien cal o cm.
     !RHO: Densidad del material [kg/m]
     !K/(C*RHO) = ALFA = [m²/s] por lo general, pero tienen que coincidir las unidades
-    REAL(8), PARAMETER :: C = 1., K = 1., RHO = 1., PI = 3.14159265359
+    REAL(8), PARAMETER :: C = 900., K = 247., RHO = 2700., PI = 3.14159265359
 CONTAINS
     
     !Inicializa los valores del vector U, las dimensiones físicas y el tiempo final.
@@ -21,20 +21,20 @@ CONTAINS
         REAL(8) :: X
         INTEGER :: I, N
         
-        XFINAL = 1.
-        TFINAL = 0.2
+        XFINAL = 0.3
+        TFINAL = 15.
         
         N = NINT(XFINAL/DX) + 1 !Redondeo a int y sumo 1.
         ALLOCATE(UINI(N))
         !Condiciones iniciales
-        X = 0.
-        DO I = 2, N-1
-            X = X + DX
-            UINI(I) = SIN(PI * X)
-        END DO
-        
+!        X = 0.
+!        DO I = 2, N-1
+!            X = X + DX
+!            UINI(I) = SIN(PI * X)
+!        END DO
+        UINI(:) = 25.
         !Condiciones de frontera
-        UINI(1) = 0.; UINI(N) = 0.;
+        UINI(1) = 200.;! UINI(N) = 0.;
     END SUBROUTINE
     
     !Se les da valores a dos de las tres variables, la otra queda en 0.
@@ -45,11 +45,12 @@ CONTAINS
         REAL(8), INTENT(OUT) :: DX, DT, R
         !
 !        DX = 0D0
-        DX = 0.1
-        DT = 0D0
-!        DT = 0.02
+        DX = 0.01
+!        DT = 0D0
+        DT = 0.5
+        R = 0D0
 !        R =  1.
-        R = 0.5
+!        R = 0.5
 !        R =  1./6.
     END SUBROUTINE
     
@@ -83,7 +84,8 @@ CONTAINS
     !du/dt = alfa. (d²u/dx²)
     FUNCTION CALC_ALFA()
         REAL(8) :: CALC_ALFA
-         CALC_ALFA = 1D0   
-        !CALC_ALFA = K/(C*RHO)
+!         CALC_ALFA = 1D0   
+        CALC_ALFA = K/(C*RHO)
+        PRINT *, 'Valor de alfa: ', CALC_ALFA
     END FUNCTION
 END MODULE
