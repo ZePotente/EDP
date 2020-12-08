@@ -55,23 +55,31 @@ CONTAINS
     FUNCTION CALC_DX(DT, R)
         REAL(8) :: CALC_DX
         REAL(8), INTENT(IN) :: DT, R
-        !REAL(8), INTENT(IN), OPTIONAL :: R
         
-        CALC_DX = SQRT((K*DT)/(C*RHO*R))
+        CALC_DX = SQRT(CALC_ALFA()*DT/R)
+        !CALC_DX = SQRT((K*DT)/(C*RHO*R))
     END FUNCTION
     
     FUNCTION CALC_DT(DX, R)
         REAL(8) :: CALC_DT
         REAL(8), INTENT(IN) :: DX, R
-        !REAL(8), INTENT(IN), OPTIONAL :: R
         
-            CALC_DT = R * (C * RHO * DX*DX)/K
+        CALC_DT = (R * DX*DX)/CALC_ALFA()
+        !CALC_DT = R * (C * RHO * DX*DX)/K
     END FUNCTION
 
     FUNCTION CALC_R(DX, DT)
         REAL(8) :: CALC_R
         REAL(8), INTENT(IN) :: DX, DT
         
-        CALC_R = K*DT/(C*RHO*DX*DX)
+        CALC_R = CALC_ALFA()*DT/(DX*DX)
+    END FUNCTION
+    
+    !Está aclarado arriba, pero: alfa = K/(C*RHO)
+    !du/dt = alfa. (d²u/dx²)
+    FUNCTION CALC_ALFA()
+        REAL(8) :: CALC_ALFA
+            
+        CALC_ALFA = K/(C*RHO)
     END FUNCTION
 END MODULE
