@@ -40,7 +40,7 @@ CONTAINS
     SUBROUTINE CALCULOS_DE_R(DX, DT, R)
         REAL(8), INTENT(OUT) :: DX, DT, R
         !
-        REAL(8), PARAMETER :: ERROR = 1E-10
+        REAL(8), PARAMETER :: ERROR = 1E-6 !Error limite teniendo en cuenta el error de truncamiento arrastrado por sumar numeros en punto flotante.
         !Obtengo los valores dato de las dos que correspondan
         CALL INICIALIZAR_VALORES_R(DX, DT, R)
         !La que hay que calcular está inicializada en 0, y sólo esa en 0, 

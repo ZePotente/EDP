@@ -11,7 +11,7 @@ MODULE EDP_SETUP
     REAL(8), PARAMETER :: C = 1., K = 1., RHO = 1., PI = 3.14159265359
 CONTAINS
     
-    !Inicializa los valores del vector U y las dimensiones físicas y temporales iniciales.
+    !Inicializa los valores del vector U, las dimensiones físicas y el tiempo final.
     !O sea U con cond iniciales y frontera, y XFINAL y TFINAL
     SUBROUTINE INICIALIZAR_EDP(UINI, DX, XFINAL, TFINAL)
         REAL(8), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: UINI
