@@ -23,7 +23,7 @@ PROGRAM EDP
     PRINT *, 'XFINAL = ', XFINAL, 'TFINAL = ', TFINAL
     
     !Por defecto, si R > 0.5 va al implícito. Descomentar la linea de abajo para ir al implícito directamente.
-    GOTO 20
+!    GOTO 20
     IF (R > 0.5) GOTO 20
     PRINT *, 'Empezando método explícito.'
     CALL MET_EXPLICITO(UINI, UFIN, DX, DT, TFINAL, R)
@@ -32,10 +32,11 @@ PROGRAM EDP
  20 PRINT *, 'R mayor a 0.5, se intenta con método implícito.'
     TOL = 0.00001
     PRINT *, 'Se establece una tolerancia TOL = ', TOL
-    PRINT *, 'Empezando método implícito.'
+    PRINT *, 'Empezando método implícito (Crank-Nicolson).'
     CALL MET_IMPLICITO(UINI, UFIN, DX, DT, TFINAL, R, TOL)
     PRINT *, 'Fin método implícito.'
  10 PRINT *, 'Fin.'
+    CALL SYSTEM("gnuplot script_base.p")
 CONTAINS
     SUBROUTINE CALCULOS_DE_R(DX, DT, R)
         REAL(8), INTENT(OUT) :: DX, DT, R
@@ -84,7 +85,9 @@ CONTAINS
         !El ciclo en sí.
         DO WHILE(T <= TFINAL)
             T = T + DT
+            U(1) = 800./EXP(T/100.)
             UANT = U
+            
             DO I = 2, N-1
                 IF (R == 0.5) THEN !Sé que estoy haciendo un if en cada iteración y no me importa.
                     U(I) = (UANT(I+1) + UANT(I-1)) / 2.
@@ -129,6 +132,7 @@ CONTAINS
         DO WHILE(T <= TFINAL)
             T = T + DT
             UANT = U
+            U(1) = 800./EXP(T/100.)
             ERROR = 2*TOL 
             ITER = 0; ERROR = 2.*TOL !Valor imposible
             DO WHILE(ITER < MAXITER .AND. ERROR >= TOL)
